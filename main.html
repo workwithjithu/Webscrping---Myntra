@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #resultBox {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            width: 200px;
+            height: 300px;
+            margin: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            overflow: hidden;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    
+    <div id="app">
+        <input type="text" id="inputstring">
+        <div id="resultBox"></div>
+    </div>
+
+    <script>
+        const stringUploadInput = document.querySelector('#inputstring');
+        stringUploadInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const inputValue = e.target.value;
+                fetch('http://localhost:3000/upload', {
+                    method: 'POST',
+                    body: JSON.stringify({ input: inputValue })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    const resultBox = document.querySelector('#resultBox');
+                    resultBox.innerHTML = ''; // Clear existing images
+
+                    const visualMatches = data.images_results.slice(0, 5);
+
+                    visualMatches.forEach(element => {
+                        const box = `
+                            <div class="card">
+                                <img src="${element.thumbnail}" alt="">
+                                <div class="content">
+                                    <a href="${element.link}">${element.title}</a>
+                                </div>
+                            </div>
+                        `;
+
+                        resultBox.innerHTML += box;
+                    });
+                
+                }) 
+                .catch(err => console.log(err));
+            }
+        });
+
+    </script>
+</body>
+</html>
